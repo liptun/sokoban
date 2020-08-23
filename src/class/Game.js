@@ -1,14 +1,14 @@
 import * as PIXI from 'pixi.js'
 import { PixiStatsPlugin } from '@koreez/pixi-stats';
+import Collider from './Collider'
 import Player from './Player'
 import Crate from './Crate'
 
 
 
-PIXI.Application.registerPlugin(PixiStatsPlugin);
-
 export default class Game extends PIXI.Application {
     constructor() {
+        PIXI.Application.registerPlugin(PixiStatsPlugin);
         super({ backgroundColor: 0xcdcdcd })
         document.body.appendChild(this.view);
         document.body.appendChild(this.stats.dom);
@@ -16,41 +16,10 @@ export default class Game extends PIXI.Application {
             this.stats.update();
         });
 
+        this.collider = new Collider(this)
+
         this.setup()
         this.ticker.add(this.tick)
-    }
-
-    isCollision = (objectA, objectB) => {
-        const ab = objectA.getBounds()
-        const bb = objectB.getBounds()
-        return ab.x + ab.width > bb.x && ab.x < bb.x + bb.width && ab.y + ab.height > bb.y && ab.y < bb.y + bb.height
-    }
-
-    watchCollisions = (objectA, objectB, callback) => {
-        this.ticker.add(() => {
-            let collidersA = []
-            let collidersB = []
-
-            if ( objectA.constructor.name === 'Container' ) {
-                collidersA = objectA.children
-            } else {
-                collidersA.push(objectA)
-            }
-
-            if ( objectB.constructor.name === 'Container' ) {
-                collidersB = objectB.children
-            } else {
-                collidersB.push(objectB)
-            }
-
-            for ( let a = 0; a < collidersA.length; a++ ) {
-                for (let b = 0; b < collidersB.length; b++) {
-                    if ( this.isCollision(collidersA[a], collidersB[b]) ) {
-                        callback(collidersA[a], collidersB[b])
-                    }
-                }
-            }
-        })
     }
 
     setup = () => {
@@ -67,7 +36,7 @@ export default class Game extends PIXI.Application {
         this.stage.addChild( crates )
         this.stage.addChild( player )
 
-        this.watchCollisions(player, crates, (player, crate) => {
+        this.collider.watch(player, crates, (player, crate) => {
             console.log('collision detected', player, crate)
             crate.y -= 1
         })
