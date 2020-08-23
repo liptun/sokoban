@@ -4,14 +4,31 @@ import playerTextures from '../sprites/player/playerTextures'
 
 export default class Player extends PIXI.AnimatedSprite {
     currentAnimation = undefined
+    targetX = undefined
+    targetY = undefined
+    minMoveDistance = 64
+    walking = false
 
-    constructor() {
+    constructor({x, y}) {
         const defaultTexture = playerTextures.walk.down
         super(defaultTexture)
         this.animationSpeed = .1
 
-        this.anchor.x = .5
-        this.anchor.y = .5
+        this.x = x
+        this.y = y
+
+        this.targetX = this.x
+        this.targetY = this.y
+
+        this.lastX = this.x
+        this.lastY = this.y
+    }
+
+    block = () => {
+        this.targetX = this.lastX
+        this.targetY = this.lastY
+        this.x = this.lastX
+        this.y = this.lastY
     }
 
     tick = () => {
@@ -23,31 +40,62 @@ export default class Player extends PIXI.AnimatedSprite {
         const keyLeft = Keyboard.isKeyDown('ArrowLeft', 'KeyA')
         const keyRight = Keyboard.isKeyDown('ArrowRight', 'KeyD')
 
-        if (keyUp) {
-            this.y -= 3
-            this.setAnimation('UP_WALK')
-        }
 
-        if (keyDown) {
-            this.y += 3
-            this.setAnimation('DOWN_WALK')
-        }
 
-        if (keyLeft) {
-            this.x -= 3
+        this.lastX = this.x
+        this.lastY = this.y
+
+        if ( this.x > this.targetX ) {
+            this.x -= 4
             this.setAnimation('LEFT_WALK')
-        }
-
-        if (keyRight) {
-            this.x += 3
+        } else if ( this.x < this.targetX ) {
+            this.x += 4
             this.setAnimation('RIGHT_WALK')
         }
 
-        if (!keyUp && !keyDown && !keyLeft && !keyRight) {
-            this.setAnimation('DOWN_IDLE')
+        if ( this.y > this.targetY ) {
+            this.y -= 4
+            this.setAnimation('UP_WALK')
+        } else if ( this.y < this.targetY ) {
+            this.y += 4
+            this.setAnimation('DOWN_WALK')
         }
 
 
+
+        if ( this.y === this.lastY && this.x === this.lastX ) {
+            this.walking = false
+        }
+
+
+        
+        if (!this.walking) {
+            if (keyUp) {
+                this.targetY -= this.minMoveDistance
+                this.walking = true
+            }
+    
+            if (keyDown) {
+                this.targetY += this.minMoveDistance
+                this.walking = true
+            }
+    
+            if (keyLeft) {
+                this.targetX -= this.minMoveDistance
+                this.walking = true
+            }
+    
+            if (keyRight) {
+                this.targetX += this.minMoveDistance
+                this.walking = true
+            }
+    
+        }
+
+        
+        if ( !this.walking ) {
+            this.setAnimation('DOWN_IDLE')
+        }
 
     }
 

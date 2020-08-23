@@ -7,6 +7,24 @@ import Crate from './Crate'
 
 
 export default class Game extends PIXI.Application {
+    maze = [
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0],
+        [0,0,0,1,1,1,1,1,0,0,0,1,0,0,0,0],
+        [0,0,0,1,0,0,0,1,0,1,1,1,0,0,0,0],
+        [0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0],
+        [0,0,0,1,0,0,0,1,1,1,0,1,0,0,0,0],
+        [0,0,0,1,0,0,0,1,0,1,0,1,0,0,0,0],
+        [0,0,0,1,0,0,0,1,0,1,0,1,0,0,0,0],
+        [0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ]
     constructor() {
         PIXI.Application.registerPlugin(PixiStatsPlugin);
         super({ backgroundColor: 0xcdcdcd })
@@ -23,23 +41,32 @@ export default class Game extends PIXI.Application {
     }
 
     setup = () => {
-        const player = new Player()
-        player.x = 300
-        player.y = 300
+        const player = new Player({x: 5 * 64, y: 5 * 64})
         
         const crates = new PIXI.Container()
-        crates.addChild( new Crate({x: 260, y: 100}) )
-        crates.addChild( new Crate({x: 220, y: 100}) )
-        crates.addChild( new Crate({x: 290, y: 150}) )
-        crates.addChild( new Crate({x: 260, y: 280}) )
-        crates.addChild( new Crate() )
+
+        this.getMaze().forEach(crate => crates.addChild(crate))
         this.stage.addChild( crates )
+        
         this.stage.addChild( player )
 
         this.collider.watch(player, crates, (player, crate) => {
-            console.log('collision detected', player, crate)
-            crate.y -= 1
+            player.block()
+            // console.log('collision detected', player, crate)
+            // crate.y -= 1
         })
+    }
+
+    getMaze = () => {
+        const maze = []
+        for (let y = 0; y < this.maze.length; y++) {
+            for (let x = 0; x < this.maze[y].length; x++) {
+                if ( this.maze[y][x] === 1 ) {
+                    maze.push( new Crate({x: x*64, y: y*64}) )
+                }
+            }
+        }
+        return maze
     }
 
     tickChildren = (children) => {
