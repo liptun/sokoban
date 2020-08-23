@@ -59,15 +59,17 @@ export default class Game extends PIXI.Application {
         player.y = 300
         
         const crates = new PIXI.Container()
-        const crate = new Crate({x: 400, y: 400})
-        crates.addChild( crate )
         crates.addChild( new Crate({x: 260, y: 100}) )
+        crates.addChild( new Crate({x: 220, y: 100}) )
+        crates.addChild( new Crate({x: 290, y: 150}) )
+        crates.addChild( new Crate({x: 260, y: 280}) )
         crates.addChild( new Crate() )
         this.stage.addChild( crates )
         this.stage.addChild( player )
 
-        this.watchCollisions(player, crates, (a, b) => {
-            console.log('collision detected', a, b)
+        this.watchCollisions(player, crates, (player, crate) => {
+            console.log('collision detected', player, crate)
+            crate.y -= 1
         })
     }
 
