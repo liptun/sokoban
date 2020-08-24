@@ -1,37 +1,33 @@
 import * as PIXI from 'pixi.js'
 import Keyboard from 'pixi.js-keyboard'
+import Entity from './Entity'
 import playerTextures from '../sprites/player/playerTextures'
 
-export default class Player extends PIXI.AnimatedSprite {
-    currentAnimation = undefined
-    targetX = undefined
-    targetY = undefined
-    minMoveDistance = 64
-    walking = false
+export default class Player extends Entity {
 
     constructor({x, y}) {
-        const defaultTexture = playerTextures.walk.down
-        super(defaultTexture)
-        this.animationSpeed = .1
-
-        this.x = x
-        this.y = y
-
-        this.targetX = this.x
-        this.targetY = this.y
-
-        this.lastX = this.x
-        this.lastY = this.y
+        super({x, y})
+        this.textures = playerTextures.idle.down
     }
 
-    block = () => {
-        this.targetX = this.lastX
-        this.targetY = this.lastY
-        this.x = this.lastX
-        this.y = this.lastY
-    }
+    customTick = () => {
 
-    tick = () => {
+        if (!this.inMotion) {
+            switch (this.motionDirection) {
+                case 'up':
+                    this.textures = playerTextures.idle.up
+                    break
+                case 'down':
+                    this.textures = playerTextures.idle.down
+                    break
+                case 'left':
+                    this.textures = playerTextures.idle.left
+                    break
+                case 'right':
+                    this.textures = playerTextures.idle.right
+                    break
+            }
+        }
 
         Keyboard.update()
 
@@ -40,96 +36,63 @@ export default class Player extends PIXI.AnimatedSprite {
         const keyLeft = Keyboard.isKeyDown('ArrowLeft', 'KeyA')
         const keyRight = Keyboard.isKeyDown('ArrowRight', 'KeyD')
 
-
-
-        this.lastX = this.x
-        this.lastY = this.y
-
-        if ( this.x > this.targetX ) {
-            this.x -= 4
-            this.setAnimation('LEFT_WALK')
-        } else if ( this.x < this.targetX ) {
-            this.x += 4
-            this.setAnimation('RIGHT_WALK')
-        }
-
-        if ( this.y > this.targetY ) {
-            this.y -= 4
-            this.setAnimation('UP_WALK')
-        } else if ( this.y < this.targetY ) {
-            this.y += 4
-            this.setAnimation('DOWN_WALK')
-        }
-
-
-
-        if ( this.y === this.lastY && this.x === this.lastX ) {
-            this.walking = false
-        }
-
-
-        
-        if (!this.walking) {
+        if (!this.isBusy) {
             if (keyUp) {
-                this.targetY -= this.minMoveDistance
-                this.walking = true
+                this.moveUp()
+            } else if (keyDown) {
+                this.moveDown()
+            } else if (keyLeft) {
+                this.moveLeft()
+            } else if (keyRight) {
+                this.moveRight()
             }
-    
-            if (keyDown) {
-                this.targetY += this.minMoveDistance
-                this.walking = true
-            }
-    
-            if (keyLeft) {
-                this.targetX -= this.minMoveDistance
-                this.walking = true
-            }
-    
-            if (keyRight) {
-                this.targetX += this.minMoveDistance
-                this.walking = true
-            }
-    
-        }
-
-        
-        if ( !this.walking ) {
-            this.setAnimation('DOWN_IDLE')
         }
 
     }
 
-    setAnimation(name) {
-        if ( this.currentAnimation === name ) {
-            return
+    collision = (player, entity) => {
+        if ( entity.constructor.name === 'Crate' ) {
+            this.block()
+            this.collisionWithCrate(entity)
         }
-        this.currentAnimation = name
-        switch (name) {
-            case 'UP_WALK':
-                this.textures = playerTextures.walk.up
-                break;
-            case 'DOWN_WALK':
-                this.textures = playerTextures.walk.down
-                break;
-            case 'LEFT_WALK':
-                this.textures = playerTextures.walk.left
-                break;
-            case 'RIGHT_WALK':
-                this.textures = playerTextures.walk.right
-                break;
-            case 'UP_IDLE':
-                this.textures = playerTextures.idle.up
-                break;
-            case 'DOWN_IDLE':
-                this.textures = playerTextures.idle.down
-                break;
-            case 'LEFT_IDLE':
-                this.textures = playerTextures.idle.left
-                break;
-            case 'RIGHT_IDLE':
-                this.textures = playerTextures.idle.right
-                break;
+        if ( entity.constructor.name === 'Brick' ) {
+            this.block()
         }
+    }
+
+    collisionWithCrate = (crate) => {
+        if (!crate.isBusy) {
+            switch (this.motionDirection) {
+                case 'up':
+                    crate.moveUp()
+                    break
+                case 'down':
+                    crate.moveDown()
+                    break
+                case 'left':
+                    crate.moveLeft()
+                    break
+                case 'right':
+                    crate.moveRight()
+                    break
+            }
+        }
+    }
+
+    onMotionUp = () => {
+        this.textures = playerTextures.walk.up
+        this.play()
+    }
+    onMotionDown = () => {
+        this.textures = playerTextures.walk.down
+        this.play()
+    }
+    onMotionLeft = () => {
+        this.textures = playerTextures.walk.left
+        this.play()
+    }
+    onMotionRight = () => {
+        this.textures = playerTextures.walk.right
         this.play()
     }
 }
