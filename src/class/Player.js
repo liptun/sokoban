@@ -4,14 +4,12 @@ import Entity from './Entity'
 import playerTextures from '../sprites/player/playerTextures'
 
 export default class Player extends Entity {
-
-    constructor({x, y}) {
-        super({x, y})
+    constructor({ x, y }) {
+        super({ x, y })
         this.textures = playerTextures.idle.down
     }
 
     customTick = () => {
-
         if (!this.inMotion) {
             switch (this.motionDirection) {
                 case 'up':
@@ -47,15 +45,14 @@ export default class Player extends Entity {
                 this.moveRight()
             }
         }
-
     }
 
     collision = (player, entity) => {
-        if ( entity.constructor.name === 'Crate' ) {
+        if (entity.constructor.name === 'Crate') {
             this.block()
             this.collisionWithCrate(entity)
         }
-        if ( entity.constructor.name === 'Brick' ) {
+        if (entity.constructor.name === 'Brick') {
             this.block()
         }
     }

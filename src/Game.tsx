@@ -1,12 +1,12 @@
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react'
 
-import Game from "./class/Game";
+import Game from './class/Game'
 
 const GameBootstrap = () => {
-  useEffect(() => {
-    new Game();
-  }, []);
-  return null;
-};
+    useEffect(() => {
+        new Game()
+    }, [])
+    return null
+}
 
-export default GameBootstrap;
+export default GameBootstrap

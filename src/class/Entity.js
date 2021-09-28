@@ -13,11 +13,11 @@ export default class Entity extends PIXI.AnimatedSprite {
     motionSpeed = 4
     motionStep = 64
     motionBuffer = [0, 0]
-    animationSpeed = .15
+    animationSpeed = 0.15
     collider = undefined
     colliders = []
 
-    constructor({x = 0, y = 0}) {
+    constructor({ x = 0, y = 0 }) {
         super([PIXI.Texture.from(defaultEntityImage)])
 
         this.x = x
@@ -33,7 +33,7 @@ export default class Entity extends PIXI.AnimatedSprite {
     }
 
     checkColliders = () => {
-        this.colliders.forEach(collider => {
+        this.colliders.forEach((collider) => {
             this.collider.check(this, collider, this.collision)
         })
     }
@@ -46,28 +46,28 @@ export default class Entity extends PIXI.AnimatedSprite {
         this.lastX = this.x
         this.lastY = this.y
 
-        if ( this.x > this.targetX ) {
+        if (this.x > this.targetX) {
             this.x -= this.motionSpeed
-        } else if ( this.x < this.targetX ) {
+        } else if (this.x < this.targetX) {
             this.x += this.motionSpeed
         }
 
-        if ( this.y > this.targetY ) {
+        if (this.y > this.targetY) {
             this.y -= this.motionSpeed
-        } else if ( this.y < this.targetY ) {
+        } else if (this.y < this.targetY) {
             this.y += this.motionSpeed
         }
 
         this.motionBuffer.shift()
-        if ( (this.targetX === this.lastX) && (this.targetY === this.lastY) ) {
+        if (this.targetX === this.lastX && this.targetY === this.lastY) {
             this.motionBuffer.push(0)
             this.isBusy = false
         } else {
             this.motionBuffer.push(1)
             this.isBusy = true
         }
-        
-        if ( this.motionBuffer.reduce((acu, last) => acu + last) === 0 ) {
+
+        if (this.motionBuffer.reduce((acu, last) => acu + last) === 0) {
             this.inMotion = false
         } else {
             this.inMotion = true
