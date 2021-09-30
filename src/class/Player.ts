@@ -1,10 +1,12 @@
-import * as PIXI from 'pixi.js'
+// @ts-ignore
 import Keyboard from 'pixi.js-keyboard'
 import Entity from './Entity'
 import playerTextures from '../sprites/player/playerTextures'
+import { Direction } from './Entity'
+import Crate from './Crate'
 
 export default class Player extends Entity {
-    constructor({ x, y }) {
+    constructor({ x = 0, y = 0 } = {}) {
         super({ x, y })
         this.textures = playerTextures.idle.down
     }
@@ -12,16 +14,16 @@ export default class Player extends Entity {
     customTick = () => {
         if (!this.inMotion) {
             switch (this.motionDirection) {
-                case 'up':
+                case Direction.Up:
                     this.textures = playerTextures.idle.up
                     break
-                case 'down':
+                case Direction.Down:
                     this.textures = playerTextures.idle.down
                     break
-                case 'left':
+                case Direction.Left:
                     this.textures = playerTextures.idle.left
                     break
-                case 'right':
+                case Direction.Right:
                     this.textures = playerTextures.idle.right
                     break
             }
@@ -47,7 +49,7 @@ export default class Player extends Entity {
         }
     }
 
-    collision = (player, entity) => {
+    collision = (player: Entity, entity: Entity) => {
         if (entity.constructor.name === 'Crate') {
             this.block()
             this.collisionWithCrate(entity)
@@ -57,19 +59,19 @@ export default class Player extends Entity {
         }
     }
 
-    collisionWithCrate = (crate) => {
+    collisionWithCrate = (crate: Crate) => {
         if (!crate.isBusy) {
             switch (this.motionDirection) {
-                case 'up':
+                case Direction.Up:
                     crate.moveUp()
                     break
-                case 'down':
+                case Direction.Down:
                     crate.moveDown()
                     break
-                case 'left':
+                case Direction.Left:
                     crate.moveLeft()
                     break
-                case 'right':
+                case Direction.Right:
                     crate.moveRight()
                     break
             }

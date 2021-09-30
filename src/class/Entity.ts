@@ -2,6 +2,13 @@ import * as PIXI from 'pixi.js'
 import Collider from './Collider'
 import defaultEntityImage from '../sprites/entity.png'
 
+export enum Direction {
+    Up = 'UP',
+    Down = 'DOWN',
+    Left = 'LEFT',
+    Right = 'RIGHT',
+}
+
 export default class Entity extends PIXI.AnimatedSprite {
     targetX = 0
     targetY = 0
@@ -9,15 +16,15 @@ export default class Entity extends PIXI.AnimatedSprite {
     lastY = 0
     inMotion = false
     isBusy = false
-    motionDirection = undefined
+    motionDirection: Direction = Direction.Up
     motionSpeed = 4
     motionStep = 64
     motionBuffer = [0, 0]
     animationSpeed = 0.15
-    collider = undefined
+    collider: Collider
     colliders = []
 
-    constructor({ x = 0, y = 0 }) {
+    constructor({ x = 0, y = 0 } = {}) {
         super([PIXI.Texture.from(defaultEntityImage)])
 
         this.x = x
@@ -38,7 +45,7 @@ export default class Entity extends PIXI.AnimatedSprite {
         })
     }
 
-    collision = (a, b) => {
+    collision = (a: Entity, b: Entity) => {
         console.warn('Entity collision between', a.constructor.name, 'and', b.constructor.name)
     }
 
@@ -81,22 +88,22 @@ export default class Entity extends PIXI.AnimatedSprite {
 
     moveUp = () => {
         this.targetY -= this.motionStep
-        this.motionDirection = 'up'
+        this.motionDirection = Direction.Up
         this.onMotionUp()
     }
     moveDown = () => {
         this.targetY += this.motionStep
-        this.motionDirection = 'down'
+        this.motionDirection = Direction.Down
         this.onMotionDown()
     }
     moveLeft = () => {
         this.targetX -= this.motionStep
-        this.motionDirection = 'left'
+        this.motionDirection = Direction.Left
         this.onMotionLeft()
     }
     moveRight = () => {
         this.targetX += this.motionStep
-        this.motionDirection = 'right'
+        this.motionDirection = Direction.Right
         this.onMotionRight()
     }
 
