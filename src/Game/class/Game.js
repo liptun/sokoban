@@ -25,8 +25,9 @@ export default class Game extends PIXI.Application {
             width: 1280,
             height: 720,
         })
-        document.body.appendChild(this.view)
-        document.body.appendChild(this.stats.dom)
+        document.getElementById('game').innerHTML = ''
+        document.getElementById('game').appendChild(this.view)
+        document.getElementById('game').appendChild(this.stats.dom)
         this.ticker.add(() => {
             this.stats.update()
         })
